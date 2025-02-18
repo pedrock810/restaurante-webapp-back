@@ -8,13 +8,18 @@ const prisma = new PrismaClient();
 const SECRET = process.env.JWT_SECRET || "meusegredo"; // Pegando do .env
 
 // 🟢 Rota para criar um usuário
-router.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
+app.post("/register", async (req, res) => {
+  const { name, email, password, isAdmin } = req.body; // Adicionamos "isAdmin"
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
     const user = await prisma.user.create({
-      data: { name, email, password: hashedPassword },
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        isAdmin: isAdmin || false, // Se não enviado, assume "false"
+      },
     });
     res.status(201).json(user);
   } catch (error) {
