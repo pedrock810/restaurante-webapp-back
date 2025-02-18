@@ -2,10 +2,13 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { PrismaClient } = require("@prisma/client");
+const { authenticate, isAdmin } = require("./middlewares/authMiddleware"); // Importação dos middlewares
 
 // Inicializa o Prisma e Express
 const prisma = new PrismaClient();
 const app = express();
+
+const SECRET = process.env.JWT_SECRET || "meusegredo"; // Definir via variável de ambiente  
 
 // Middlewares
 app.use(express.json());
