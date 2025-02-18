@@ -57,7 +57,7 @@ router.get("/me", async (req, res) => {
 });
 
 // 🔹 Rota protegida - Somente administradores podem acessar
-app.get("/admin-dashboard", authenticate, isAdmin, (req, res) => {
+router.get("/admin-dashboard", authenticate, isAdmin, (req, res) => {
   res.json({ message: "Bem-vindo ao painel de administração!" });
 });
 

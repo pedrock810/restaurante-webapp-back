@@ -8,8 +8,6 @@ const { authenticate, isAdmin } = require("./middlewares/authMiddleware"); // Im
 const prisma = new PrismaClient();
 const app = express();
 
-const SECRET = process.env.JWT_SECRET || "meusegredo"; // Definir via variável de ambiente  
-
 // Middlewares
 app.use(express.json());
 app.use(cors());
