@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
+const { authenticate, isAdmin } = require("./middlewares/authMiddleware"); // Importação dos middlewares
 
 const router = express.Router();
 const prisma = new PrismaClient();

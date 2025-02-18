@@ -2,7 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { PrismaClient } = require("@prisma/client");
-const { authenticate, isAdmin } = require("./middlewares/authMiddleware"); // Importação dos middlewares
 
 // Inicializa o Prisma e Express
 const prisma = new PrismaClient();
