@@ -30,21 +30,19 @@ router.get("/users", authenticate, isAdmin, async (req, res) => {
 });
 
 // 🔹 Rota para editar um usuário (Apenas Admins podem editar usuários comuns)
-router.put("/users/:id", authenticate, isAdmin, async (req, res) => {
+router.put("/admin/users/:id", authenticate, isAdmin, async (req, res) => {
   const { id } = req.params;
   const { name, email, password } = req.body;
 
   try {
-    // Verificar se o usuário existe
     const user = await prisma.user.findUnique({ where: { id } });
+
     if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
 
-    // Impedir alteração de outros administradores
     if (user.isAdmin) {
       return res.status(403).json({ error: "Administradores não podem editar outros administradores" });
     }
 
-    // Atualizar os dados (criptografando a senha se necessário)
     const updatedData = {
       name: name || user.name,
       email: email || user.email,
@@ -62,6 +60,7 @@ router.put("/users/:id", authenticate, isAdmin, async (req, res) => {
     res.status(500).json({ error: "Erro interno no servidor" });
   }
 });
+
 
 module.exports = router;
   
