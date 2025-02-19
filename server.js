@@ -1,10 +1,12 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const { PrismaClient } = require("@prisma/client");
 
-// Inicializa o Prisma e Express
+// Prisma
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+
+// Inicializa Express
 const app = express();
 
 // Middlewares
@@ -13,11 +15,11 @@ app.use(cors());
 
 // Importação das rotas
 const userRoutes = require("./routes/userRoutes");
-app.use("/api", userRoutes);
-
 const adminRoutes = require("./routes/adminRoutes");
-app.use("/api/admin", adminRoutes);
 
-// Inicialização do servidor
+// 🔹 Use as rotas de usuário antes das de admin para evitar conflitos
+app.use("/api", userRoutes);
+app.use("/api/admin", adminRoutes); // Altere para "/api/admin" para evitar conflito com "/api/users"
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
