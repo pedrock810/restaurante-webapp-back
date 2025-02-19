@@ -1,6 +1,8 @@
 const express = require("express");
+const { PrismaClient } = require("@prisma/client");
 const { authenticate, isAdmin } = require("../middlewares/authMiddleware"); // Importação dos middlewares
 
+const prisma = new PrismaClient();
 const router = express.Router();
 
 // 🔹 Rota protegida - Somente administradores podem acessar
@@ -15,8 +17,7 @@ router.get("/users", authenticate, isAdmin, async (req, res) => {
       select: {
         id: true,
         name: true,
-        email: true,
-        isAdmin: true,
+        email: true
       },
     });
     res.json(users);
