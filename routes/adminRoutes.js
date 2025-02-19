@@ -14,7 +14,7 @@ router.get("/admin-dashboard", authenticate, isAdmin, (req, res) => {
 });
   
 // 🔹 Rota para listar todos os usuários (Somente para Admins)
-router.get("/users", authenticate, isAdmin, async (req, res) => {
+router.get("/admin/users", authenticate, isAdmin, async (req, res) => {
   try {
     const users = await prisma.user.findMany({
       select: {
