@@ -30,7 +30,7 @@ router.get("/users", authenticate, isAdmin, async (req, res) => {
 });
 
 // 🔹 Rota para editar um usuário (Apenas Admins podem editar usuários comuns)
-app.put("/users/:id", authenticate, isAdmin, async (req, res) => {
+router.put("/users/:id", authenticate, isAdmin, async (req, res) => {
   const { id } = req.params;
   const { name, email, password } = req.body;
 
