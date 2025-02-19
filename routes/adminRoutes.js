@@ -1,9 +1,12 @@
 const express = require("express");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
 const { authenticate, isAdmin } = require("../middlewares/authMiddleware"); // Importação dos middlewares
 
 const prisma = new PrismaClient();
 const router = express.Router();
+const SECRET = process.env.JWT_SECRET || "meusegredo"; // Pegando do .env
 
 // 🔹 Rota protegida - Somente administradores podem acessar
 router.get("/admin-dashboard", authenticate, isAdmin, (req, res) => {
@@ -25,6 +28,41 @@ router.get("/users", authenticate, isAdmin, async (req, res) => {
     res.status(500).json({ error: "Erro ao buscar usuários" });
   }
 });
+
+// 🔹 Rota para editar um usuário (Apenas Admins podem editar usuários comuns)
+app.put("/users/:id", authenticate, isAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { name, email, password } = req.body;
+
+  try {
+    // Verificar se o usuário existe
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
+
+    // Impedir alteração de outros administradores
+    if (user.isAdmin) {
+      return res.status(403).json({ error: "Administradores não podem editar outros administradores" });
+    }
+
+    // Atualizar os dados (criptografando a senha se necessário)
+    const updatedData = {
+      name: name || user.name,
+      email: email || user.email,
+      password: password ? await bcrypt.hash(password, 10) : user.password,
+    };
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: updatedData,
+    });
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.error("Erro ao editar usuário:", error);
+    res.status(500).json({ error: "Erro interno no servidor" });
+  }
+});
+
 
 module.exports = router;
   
