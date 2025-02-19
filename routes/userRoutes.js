@@ -2,7 +2,6 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
-const { authenticate, isAdmin } = require("../middlewares/authMiddleware"); // Importação dos middlewares
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -55,11 +54,6 @@ router.get("/me", async (req, res) => {
   } catch {
     res.status(401).json({ error: "Token inválido" });
   }
-});
-
-// 🔹 Rota protegida - Somente administradores podem acessar
-router.get("/admin-dashboard", authenticate, isAdmin, (req, res) => {
-  res.json({ message: "Bem-vindo ao painel de administração!" });
 });
 
 module.exports = router;

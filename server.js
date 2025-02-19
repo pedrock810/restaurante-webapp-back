@@ -15,6 +15,9 @@ app.use(cors());
 const userRoutes = require("./routes/userRoutes");
 app.use("/api", userRoutes);
 
+const adminRoutes = require("./routes/adminRoutes");
+app.use("/api", adminRoutes);
+
 // Inicialização do servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
