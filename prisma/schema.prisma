@@ -14,3 +14,13 @@ model User {
   password String
   isAdmin  Boolean @default(false) 
 }
+
+model Dish {
+  id          String  @id @default(uuid()) // ID único gerado automaticamente
+  name        String  @unique // Nome do prato (único)
+  description String  // Descrição do prato
+  price       Decimal // Preço do prato
+  photo       String  // URL da foto do prato
+  createdAt   DateTime @default(now()) // Data de criação
+  updatedAt   DateTime @updatedAt // Atualizado automaticamente
+}

@@ -1,12 +1,12 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+
 const { PrismaClient } = require("@prisma/client");
 const { authenticate, isAdmin } = require("../middlewares/authMiddleware"); // Importação dos middlewares
 
 const prisma = new PrismaClient();
 const router = express.Router();
-const SECRET = process.env.JWT_SECRET || "meusegredo"; // Pegando do .env
 
 // PARTE DE USUÁRIOS //  
 // 🔹 Rota para listar todos os usuários (Somente para Admins)
@@ -28,7 +28,6 @@ router.get("/admin/users", authenticate, isAdmin, async (req, res) => {
 // 🔹 Rota para obter informações de um usuário específico (Apenas Admins)
 router.get("/admin/users/:id", authenticate, isAdmin, async (req, res) => {
   const { id } = req.params;
-
   try {
     // Buscar usuário pelo ID
     const user = await prisma.user.findUnique({
@@ -81,7 +80,6 @@ router.put("/admin/users/:id", authenticate, isAdmin, async (req, res) => {
 // 🔹 Rota para deletar um usuário (Apenas Admins podem deletar usuários comuns)
 router.delete("/admin/users/:id", authenticate, isAdmin, async (req, res) => {
   const { id } = req.params;
-
   try {
     // Verificar se o usuário existe
     const user = await prisma.user.findUnique({ where: { id } });

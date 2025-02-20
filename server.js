@@ -16,7 +16,10 @@ const userRoutes = require("./routes/userRoutes");
 app.use("/api", userRoutes);
 
 const adminRoutes = require("./routes/adminRoutes");
-app.use("/api", adminRoutes)
+app.use("/api", adminRoutes);
+
+const dishRoutes = require("./routes/dishRoutes");
+app.use("/api", dishRoutes);
 
 // Inicialização do servidor
 const PORT = process.env.PORT || 3000;
