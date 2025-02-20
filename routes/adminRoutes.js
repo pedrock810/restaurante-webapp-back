@@ -8,11 +8,7 @@ const prisma = new PrismaClient();
 const router = express.Router();
 const SECRET = process.env.JWT_SECRET || "meusegredo"; // Pegando do .env
 
-// 🔹 Rota protegida - Somente administradores podem acessar
-router.get("/admin-dashboard", authenticate, isAdmin, (req, res) => {
-    res.json({ message: "Bem-vindo ao painel de administração!" });
-});
-  
+// PARTE DE USUÁRIOS //  
 // 🔹 Rota para listar todos os usuários (Somente para Admins)
 router.get("/admin/users", authenticate, isAdmin, async (req, res) => {
   try {
@@ -26,6 +22,25 @@ router.get("/admin/users", authenticate, isAdmin, async (req, res) => {
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: "Erro ao buscar usuários" });
+  }
+});
+
+// 🔹 Rota para obter informações de um usuário específico (Apenas Admins)
+router.get("/admin/users/:id", authenticate, isAdmin, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Buscar usuário pelo ID
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
+
+    res.json(user);
+  } catch (error) {
+    console.error("Erro ao buscar usuário:", error);
+    res.status(500).json({ error: "Erro interno no servidor" });
   }
 });
 
@@ -59,6 +74,31 @@ router.put("/admin/users/:id", authenticate, isAdmin, async (req, res) => {
     res.json(updatedUser);
   } catch (error) {
     console.error("Erro ao editar usuário:", error);
+    res.status(500).json({ error: "Erro interno no servidor" });
+  }
+});
+
+// 🔹 Rota para deletar um usuário (Apenas Admins podem deletar usuários comuns)
+router.delete("/admin/users/:id", authenticate, isAdmin, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Verificar se o usuário existe
+    const user = await prisma.user.findUnique({ where: { id } });
+
+    if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
+
+    // Impedir que um admin delete outro admin
+    if (user.isAdmin) {
+      return res.status(403).json({ error: "Administradores não podem deletar outros administradores" });
+    }
+
+    // Deletar o usuário
+    await prisma.user.delete({ where: { id } });
+
+    res.json({ message: "Usuário deletado com sucesso" });
+  } catch (error) {
+    console.error("Erro ao deletar usuário:", error);
     res.status(500).json({ error: "Erro interno no servidor" });
   }
 });
