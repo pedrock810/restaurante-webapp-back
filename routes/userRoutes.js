@@ -57,4 +57,54 @@ router.get("/me", async (req, res) => {
   }
 });
 
+// 🔹 Rota para editar perfil (Somente o próprio usuário pode editar)
+router.put("/users/update", authenticate, async (req, res) => {
+  const { userId } = req.user; // Pegando o ID do usuário autenticado
+  const { name, email, password } = req.body;
+
+  try {
+    // Verificar se o e-mail já existe e não pertence ao usuário atual
+    if (email) {
+      const existingUser = await prisma.user.findUnique({ where: { email } });
+      if (existingUser && existingUser.id !== userId) {
+        return res.status(400).json({ error: "E-mail já está em uso" });
+      }
+    }
+
+    // Atualizar os dados (criptografando a senha se necessário)
+    const updatedData = {
+      name: name || undefined,
+      email: email || undefined,
+      password: password ? await bcrypt.hash(password, 10) : undefined,
+    };
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: updatedData,
+      select: { id: true, name: true, email: true }, // Apenas informações públicas
+    });
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.error("Erro ao atualizar perfil:", error);
+    res.status(500).json({ error: "Erro interno no servidor" });
+  }
+});
+
+// 🔹 Rota para excluir a própria conta
+router.delete("/users/delete", authenticate, async (req, res) => {
+  const { userId } = req.user; // Pegando o ID do usuário autenticado
+
+  try {
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    res.json({ message: "Conta excluída com sucesso" });
+  } catch (error) {
+    console.error("Erro ao excluir conta:", error);
+    res.status(500).json({ error: "Erro interno no servidor" });
+  }
+});
+
 module.exports = router;
