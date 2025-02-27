@@ -21,6 +21,9 @@ app.use("/api", adminRoutes);
 const dishRoutes = require("./routes/dishRoutes");
 app.use("/api", dishRoutes);
 
+const categoryRoutes = require("./routes/categoryRoutes"); 
+app.use("/api", categoryRoutes);
+
 // Inicialização do servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));

@@ -15,12 +15,21 @@ model User {
   isAdmin  Boolean @default(false) 
 }
 
+model Category {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+  dishes      Dish[]  // Relação com a tabela Dish
+}
+
 model Dish {
-  id          String  @id @default(uuid()) // ID único gerado automaticamente
-  name        String  @unique // Nome do prato (único)
-  description String  // Descrição do prato
-  price       Decimal // Preço do prato
-  photo       String  // URL da foto do prato
-  createdAt   DateTime @default(now()) // Data de criação
-  updatedAt   DateTime @updatedAt // Atualizado automaticamente
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String
+  price       Decimal
+  photo       String
+  categoryId  String   // Chave estrangeira para a tabela Category
+  category    Category @relation(fields: [categoryId], references: [id]) // Relação com a tabela Category
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

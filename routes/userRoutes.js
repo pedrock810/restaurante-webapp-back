@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const { PrismaClient } = require("@prisma/client");
+const { authenticate } = require("../middlewares/authMiddleware"); // 🔹 Importação correta
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -29,17 +30,25 @@ router.post("/register", async (req, res) => {
 });
 
 // 🟡 Rota para login
-router.post("/login", async (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) return res.status(400).json({ error: "Usuário não encontrado" });
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return res.status(400).json({ error: 'Usuário não encontrado' });
 
-  const validPassword = await bcrypt.compare(password, user.password);
-  if (!validPassword) return res.status(400).json({ error: "Senha inválida" });
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) return res.status(400).json({ error: 'Senha inválida' });
 
-  const token = jwt.sign({ userId: user.id }, SECRET, { expiresIn: "1h" });
-  res.json({ token });
+    // Cria o token com o nome e a informação de administrador no payload
+    const token = jwt.sign({ userId: user.id, name: user.name, isAdmin: user.isAdmin }, SECRET, { expiresIn: '1h' });
+
+    // Retorna o token, o nome e a informação de administrador
+    res.json({ token, name: user.name, isAdmin: user.isAdmin });
+  } catch (error) {
+    console.error('Erro no login:', error);
+    res.status(500).json({ error: 'Erro interno no servidor' });
+  }
 });
 
 // 🔴 Rota protegida para pegar informações do usuário
