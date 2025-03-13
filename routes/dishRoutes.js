@@ -33,6 +33,27 @@ router.get('/dishes', async (req, res) => {
   }
 });
 
+// 🔹 Rota para exibir um prato por ID
+router.get('/dishes/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const dish = await prisma.dish.findUnique({
+      where: { id },
+      include: { category: true }, // Inclui a categoria relacionada
+    });
+
+    if (!dish) {
+      return res.status(404).json({ error: 'Prato não encontrado' });
+    }
+
+    res.json(dish);
+  } catch (error) {
+    console.error('Erro ao buscar prato:', error);
+    res.status(500).json({ error: 'Erro ao buscar prato' });
+  }
+});
+
 // 🔹 Rota para atualizar um prato (Apenas Administradores)
 router.put('/dishes/:id', authenticate, isAdmin, async (req, res) => {
   const { id } = req.params;
