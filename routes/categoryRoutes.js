@@ -32,6 +32,27 @@ router.get('/categories', async (req, res) => {
   }
 });
 
+// 🔹 Rota para obter uma categoria por ID
+router.get('/categories/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const category = await prisma.category.findUnique({
+      where: { id },
+    });
+
+    if (!category) {
+      return res.status(404).json({ error: 'Categoria não encontrada' });
+    }
+
+    res.json(category);
+  } catch (error) {
+    console.error('Erro ao buscar categoria:', error);
+    res.status(500).json({ error: 'Erro ao buscar categoria' });
+  }
+});
+
+
 // 🔹 Rota para atualizar uma categoria (Apenas Administradores)
 router.put('/categories/:id', authenticate, isAdmin, async (req, res) => {
   const { id } = req.params;
