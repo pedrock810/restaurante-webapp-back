@@ -25,6 +25,7 @@ model Category {
 model Dish {
   id          String   @id @default(uuid())
   name        String   @unique
+  slug        String  @unique // 🔹 Slug deve ser único
   description String
   price       Decimal
   photo       String
